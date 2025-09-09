@@ -29,6 +29,11 @@ int validateNumber(char *a);
 int my_num(char a);
 int validateEmail(char *a);
 int dotcom(char *a);
+int dotin(char *a);
 int dist(char *a);
+void searchName(AddressBook *addressBook);
+void searchNumber(AddressBook *addressBook);
+void searchEmail(AddressBook *addressBook);
+void printContact(Contact contact);
 
 #endif
