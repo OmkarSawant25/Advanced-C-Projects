@@ -45,6 +45,7 @@ int main()
             break;
         default:
             printf("Invalid choice. Please try again.\n");
+            choice = 7;
         }
     } while (choice != 7);
 

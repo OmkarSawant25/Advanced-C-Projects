@@ -35,5 +35,9 @@ void searchName(AddressBook *addressBook);
 void searchNumber(AddressBook *addressBook);
 void searchEmail(AddressBook *addressBook);
 void printContact(Contact contact);
+void sortName(AddressBook *addressBook);
+void display(AddressBook *addressBook);
+void sortEmail(AddressBook *addressBook);
+void sortNumber(AddressBook *addressBook);
 
 #endif
