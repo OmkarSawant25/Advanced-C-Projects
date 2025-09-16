@@ -13,7 +13,7 @@ typedef struct
 typedef struct
 {
     int contactCount;
-    Contact contacts[100];
+    Contact contacts[MAX_CONTACTS];
 } AddressBook;
 
 void createContact(AddressBook *addressBook);
@@ -30,13 +30,13 @@ int validateNumber(char *a);
 int my_num(char a);
 int validateEmail(char *a);
 int dotcom(char *a);
-int dotin(char *a);
 int dist(char *a);
 
 void searchName(AddressBook *addressBook);
 void searchNumber(AddressBook *addressBook);
 void searchEmail(AddressBook *addressBook);
-void printContact(Contact contact);
+void searchStart(void);
+void printContact(Contact contact, int match);
 
 void sortName(AddressBook *addressBook);
 void sortNumber(AddressBook *addressBook);
