@@ -155,7 +155,7 @@ void createContact(AddressBook *addressBook)
 
     // Increase contact count after adding new contact
     addressBook->contactCount++;
-    printf("\nContact Created successfully !\n\n");
+    printf("\n✅  Contact Created successfully !\n\n");
 }
 
 // Function to search for a contact
@@ -294,9 +294,10 @@ int my_num(char a)
 int validateEmail(char *a)
 {
     int at = 0; // Count '@' symbols
+    int dotsAfterAt = 0;
     if (a[0] == '@')
         return 0; // Invalid if email starts with '@'
-    if (!(dotcom(a) && dist(a)))
+    if (!((dotcom(a) && dist(a))||(dotin(a) && distin(a))))
         return 0; // Must end with ".com" and proper '@' distance
 
     while (*a != '\0')
@@ -305,11 +306,24 @@ int validateEmail(char *a)
             return 0; // Email can't have spaces
         else if (*a == '@')
             at++; // Count '@'
+        else if (*a == '.')
+        {
+            if (at > 0) // dot after '@'
+                dotsAfterAt++;
+        }
         else if (!((*a >= 'a' && *a <= 'z') || *a == '.' || *a >= '0' && *a <= '9'))
             return 0; // Invalid character
         a++;
     }
-    return (at == 1); // Valid only if exactly one '@' present
+    // return (at == 1); // Valid only if exactly one '@' present
+    if (at != 1)
+        return 0;
+
+    // reject if more than 1 dot after '@'
+    if (dotsAfterAt > 1)
+        return 0;
+
+    return 1;
 }
 
 // Check if email ends with ".com"
@@ -336,6 +350,33 @@ int dist(char *a)
         }
     }
     if (atpos < j - 4) // '@' must come before ".com"
+        return 1;
+    return 0;
+}
+
+
+int dotin(char *a)
+{
+    int j = strlen(a) - 1; // Last character index
+    if (a[j] == 'n' && a[j - 1] == 'i' && a[j - 2] == '.')
+        return 1; // Return true if ends with ".com"
+    else
+        return 0;
+}
+
+int distin(char *a)
+{
+    int atpos = 0;         // Position of '@'
+    int j = strlen(a) - 1; // Last index
+    for (int i = 0; i < j; i++)
+    {
+        if (a[i] == '@') // Find first '@'
+        {
+            atpos = i;
+            break;
+        }
+    }
+    if (atpos < j - 3) // '@' must come before ".in"
         return 1;
     return 0;
 }

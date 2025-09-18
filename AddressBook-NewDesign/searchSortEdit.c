@@ -39,7 +39,7 @@ void searchName(AddressBook *addressBook)
         {
             printf("\t\t\tUser Name Not Found!\n");
         }
-        printf("+-------------------------------------------------------------------------------+\n\n");
+        printf("+------------------------------------------------------------------------------------------------+\n\n");
     }
     else
     {
@@ -78,7 +78,7 @@ void searchNumber(AddressBook *addressBook)
         {
             printf("\t\t\tPhone Number Not Found!\n\n");
         }
-        printf("+-------------------------------------------------------------------------------+\n\n");
+        printf("+------------------------------------------------------------------------------------------------+\n\n");
     }
     else
     {
@@ -115,7 +115,7 @@ void searchEmail(AddressBook *addressBook)
         {
             printf("\t\t\tEmail Id Not Found!\n\n");
         }
-        printf("+-------------------------------------------------------------------------------+\n\n");
+        printf("+------------------------------------------------------------------------------------------------+\n\n");
     }
     else
     {
@@ -124,15 +124,15 @@ void searchEmail(AddressBook *addressBook)
 }
 void searchStart()
 {
-    printf("+-------------------------------------------------------------------------------+\n");
+    printf("+------------------------------------------------------------------------------------------------+\n");
     printf("\t\t\t\tSearched Contacts\n");
-    printf("+-------------------------------------------------------------------------------+\n");
-    printf("| %-5s   %-20s   %-15s   %-28s |\n", "Sr.No", "Name", "Phone", "Email");
-    printf("+-------------------------------------------------------------------------------+\n");
+    printf("+------------------------------------------------------------------------------------------------+\n");
+    printf("| %-5s   %-30s   %-15s   %-35s |\n", "Sr.No", "Name", "Phone", "Email");
+    printf("+------------------------------------------------------------------------------------------------+\n");
 }
 void printContact(Contact contact, int match)
 {
-    printf("| %-5d   %-20s   %-15s   %-28s |\n", match, contact.name, contact.phone, contact.email);
+    printf("| %-5d   %-30s   %-15s   %-35s |\n", match, contact.name, contact.phone, contact.email);
 }
 
 void sortName(AddressBook *addressBook)
@@ -199,16 +199,16 @@ void display(AddressBook *addressBook)
     printf("+------------------------------------------------------------------------------------------------+\n");
     printf("\t\t\t\t   Contacts Found\n");
     printf("+------------------------------------------------------------------------------------------------+\n");
-    
+
     // printf("+-------------------------------------------------------------------------------+\n");
     printf("| %-5s   %-30s   %-15s   %-35s |\n", "Sr.No", "Name", "Phone", "Email");
-   
+
     printf("+------------------------------------------------------------------------------------------------+\n");
     for (int i = 0; i < size; i++) // Display all contacts
     {
         printf("| %-5d   %-30s   %-15s   %-35s |\n", i + 1, addressBook->contacts[i].name, addressBook->contacts[i].phone, addressBook->contacts[i].email);
     }
-    printf("+------------------------------------------------------------------------------------------------+\n");
+    printf("+------------------------------------------------------------------------------------------------+\n\n");
 }
 
 void editName(AddressBook *addressBook)
@@ -237,7 +237,7 @@ void editName(AddressBook *addressBook)
     if (validateName(newName)) // Validate new name
     {
         strcpy(addressBook->contacts[arrayIndex[index - 1]].name, newName);
-        printf("Name changed successfully ! \n\n");
+        printf("\nName changed successfully ! \n\n");
     }
     else
     {
@@ -280,7 +280,7 @@ void editNumber(AddressBook *addressBook)
             }
         }
         strcpy(addressBook->contacts[arrayIndex[index - 1]].phone, newPhone);
-        printf("Phone Number changed successfully ! \n\n");
+        printf("\nPhone Number changed successfully ! \n\n");
     }
     else
     {
@@ -314,20 +314,20 @@ void editEmail(AddressBook *addressBook)
     if (validateEmail(newEmail)) // Validate new email
     {
         // Duplicate check
-        for (int i = 0; i < addressBook->contactCount; i++) 
+        for (int i = 0; i < addressBook->contactCount; i++)
         {
-            if (i != arrayIndex[index - 1] && strcmp(addressBook->contacts[i].email, newEmail) == 0) 
+            if (i != arrayIndex[index - 1] && strcmp(addressBook->contacts[i].email, newEmail) == 0)
             {
                 printf("Email Already Exists!\n");
                 return;
             }
         }
         strcpy(addressBook->contacts[arrayIndex[index - 1]].email, newEmail);
-        printf("Email Id changed successfully ! \n\n");
+        printf("\nEmail Id changed successfully ! \n\n");
     }
     else
     {
-        printf("Invalid input ! Please Enter a Valid Email Id\n");
+        printf("❌ Invalid input ! Please Enter a Valid Email Id\n");
     }
 }
 
@@ -336,7 +336,7 @@ void delete(AddressBook *addressBook)
     int index;
     if (matchCount <= 0) // Ensure a search was done before deleting
     {
-        printf("No previous search results found! Please search first.\n");
+        printf("❌ No previous search results found! Please search again.\n");
         return;
     }
 
@@ -345,7 +345,7 @@ void delete(AddressBook *addressBook)
 
     if (index < 1 || index > matchCount) // Validate choice
     {
-        printf("Invalid serial number!\n");
+        printf("❌ Invalid serial number!\n");
         return;
     }
 
@@ -355,5 +355,5 @@ void delete(AddressBook *addressBook)
         addressBook->contacts[i] = addressBook->contacts[i + 1];
     }
     addressBook->contactCount--; // Decrease total count
-    printf("Contact deleted successfully !\n\n");
+    printf("\nContact deleted successfully !\n\n");
 }
