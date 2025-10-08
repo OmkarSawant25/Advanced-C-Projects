@@ -31,4 +31,4 @@
 30,Renault,Koleos,2021,10500.00,1
 31,Peugeot,3008,2020,11500.00,1
 32,Subaru,Outback,2021,12500.00,1
-33,Pagani,Pagani,2025,5000000.00,0
+33,Pagani,Pagani,2025,5000000.00,1
