@@ -19,6 +19,7 @@ Features:
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
+#include <stdio_ext.h>
 
 // --------------------------- Definitions ---------------------------
 #define MAX_USER 100
@@ -110,15 +111,16 @@ int main()
         printf("2. Login\n");
         printf("3. Exit\n");
         printf("Select an option: ");
-        if (scanf("%d", &option) != 1)
-        {
-            printf("❌ Invalid input! Enter a number.\n");
-            while (getchar() != '\n')
-                ; // clear buffer
-            continue;
-        }
-        while (getchar() != '\n')
-            ; // clear newline
+        scanf("%d", &option);
+        // if (scanf("%d", &option) != 1)
+        // {
+        //     printf("❌ Invalid input! Enter a number.\n");
+        //     while (getchar() != '\n')
+        //         ; // clear buffer
+        //     continue;
+        // }
+        // while (getchar() != '\n')
+        //     ; // clear newline
 
         switch (option)
         {
@@ -144,6 +146,7 @@ int main()
             return 0;
         default:
             printf("\nInvalid choice. Try again.\n");
+            __fpurge(stdin);
         }
     }
 }
