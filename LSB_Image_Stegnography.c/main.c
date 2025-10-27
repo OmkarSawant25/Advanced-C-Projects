@@ -2,6 +2,9 @@
 #include <string.h>
 #include "encode.h"
 #include "types.h"
+#include "decode.h"
+#include "common.h"
+
 OperationType check_operation_type(char *);
 
 int main(int argc, char *argv[])
@@ -38,6 +41,44 @@ int main(int argc, char *argv[])
             else
             {
                 printf("ERROR: Invalid encode arguments.\n");
+            }
+        }
+        else if (op_type == e_decode)
+        {
+            // Decoding section
+            printf("Selected encoding operation.\n");
+
+            // Step 3: Declare structure variable DecodeInfo
+            DecodeInfo dec_info;
+
+            // Step 4: Validate and read decode arguments
+            if (read_and_validate_decode_args(argv, &dec_info) == e_success)
+            {
+                printf("Decode arguments validated successfully.\n");
+                if (open_decoded_files(&dec_info) == e_success)
+                {
+                    skip_bmp_header(dec_info.fptr_stego_image);
+                    if (decode_magic_string(MAGIC_STRING, &dec_info) == e_success)
+                    {
+                        // Step 5: Call do_decoding
+                        if (do_decoding(&dec_info) == e_success)
+                        {
+                            printf("Decoding completed successfully!\n");
+                        }
+                        else
+                        {
+                            printf("ERROR: Decoding failed.\n");
+                        }
+                    }
+                    else
+                    {
+                        printf("Error: Please Provide an Encoded File.\n");
+                    }
+                }
+            }
+            else
+            {
+                printf("ERROR: Invalid decode arguments.\n");
             }
         }
         else
