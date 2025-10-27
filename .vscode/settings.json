@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdio_ext.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "string.h": "c"
     }
 }

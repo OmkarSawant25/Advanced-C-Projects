@@ -1,30 +1,53 @@
 #include <stdio.h>
+#include <string.h>
 #include "encode.h"
 #include "types.h"
 OperationType check_operation_type(char *);
 
 int main(int argc, char *argv[])
 {
-    // Step 1 : Check the argc >= 4 true - > step 2
+    // Step 1: Check for minimum argument count
     if (argc >= 4)
     {
-        // Step 2 : Call the check_operation_type(argv[1]) == e_encode )) true - > step 3
-        if (check_operation_type(argv[1]) == e_encode)
+        // Step 2: Check whether encode or decode
+        OperationType op_type = check_operation_type(argv[1]);
+
+        if (op_type == e_encode)
         {
-            // Step 3 : Declare structure variable EncodeInfo enc_info
+            // Encoding section
+            printf("Selected encoding operation.\n");
+
+            // Step 3: Declare structure variable EncodeInfo
             EncodeInfo enc_info;
-            // Step 4 : Call the read_and_validate_encode_args(argv,&enc_info) == e_success)
-            //  true -> Step 5 , false - > terminate the program
+
+            // Step 4: Validate and read encode arguments
             if (read_and_validate_encode_args(argv, &enc_info) == e_success)
             {
-                // Step 5 : Call the do_encoding (&encInfo);
-                do_encoding(&enc_info);
+                printf("Encode arguments validated successfully.\n");
+
+                // Step 5: Call do_encoding
+                if (do_encoding(&enc_info) == e_success)
+                {
+                    printf("Encoding completed successfully!\n");
+                }
+                else
+                {
+                    printf("ERROR: Encoding failed.\n");
+                }
             }
             else
             {
-                return 0;
+                printf("ERROR: Invalid encode arguments.\n");
             }
         }
+        else
+        {
+            printf("ERROR: Unsupported operation type. Use -e for encode or -d for decode.\n");
+        }
+    }
+    else
+    {
+        printf("ERROR: Invalid number of arguments.\n");
     }
 }
 

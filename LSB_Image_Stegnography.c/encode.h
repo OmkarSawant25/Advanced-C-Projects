@@ -78,4 +78,7 @@ Status encode_size_to_lsb(int size, char *imageBuffer);
 /* Copy remaining image bytes from src to stego image after encoding */
 Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest);
 
+Status validate_file_extension(const char *filename, char *valid_extns[], int extn_count);
+
+
 #endif
