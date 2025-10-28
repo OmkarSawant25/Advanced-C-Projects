@@ -65,4 +65,4 @@ Status decode_size_from_lsb(int *size, char *imageBuffer);
 /* Validates file extension during decoding */
 Status validate_file_extension_decode(const char *filename, char *valid_extns[], int extn_count);
 
-#endif // DECODE_H
+#endif

@@ -4,8 +4,6 @@
 #include "types.h"
 #include "common.h"
 
-
-
 /*
  * Checks if the given file name has a valid extension (like .bmp)
  */
