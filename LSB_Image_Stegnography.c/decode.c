@@ -184,10 +184,9 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
     }
     extn[i] = '\0';
 
-    // Combine output file name with decoded extension
-    char new_fname[100];
+    static char new_fname[100];
     sprintf(new_fname, "%s%s", decInfo->secret_fname, extn);
-    strcpy(decInfo->secret_fname, new_fname);
+    decInfo->secret_fname = new_fname;   
 
     return e_success;
 }
