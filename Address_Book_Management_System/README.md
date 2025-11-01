@@ -120,7 +120,6 @@ Enter your choice: _
 **Omkar Sawant**  
 📍 Bengaluru, Karnataka, India  
 💼 [GitHub Profile](https://github.com/OmkarSawant25)  
-📧 omkarsawant25@example.com *(optional)*  
 
 ---
 
