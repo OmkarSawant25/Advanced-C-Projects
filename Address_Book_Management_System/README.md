@@ -1,53 +1,127 @@
-Address Book Management System
+# 📘 Address Book Management System
 
------------------------------------------------------------------------------------------------------------
-🚀 Quick Start & Features
------------------------------------------------------------------------------------------------------------
+A **menu-driven C application** for managing and organizing contact information efficiently.  
+This project demonstrates **structured programming concepts**, **modular design**, and **persistent data handling** using file I/O.
 
-The Address Book System is a robust, menu-driven application built to handle contact information effectively. Its core features include:
+![Language](https://img.shields.io/badge/C-Programming-blue?logo=c)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows-red?logo=linux)
+![Status](https://img.shields.io/badge/Status-Stable-success)
 
--> Create Contact: Add new contacts with validation to ensure unique phone numbers and email addresses.
+---
 
--> Search Contact: Find contacts quickly by searching for a name, phone number, or email. The search functionality supports both exact and partial matches.
+## 🚀 Features
 
--> Edit & Delete: Safely modify or remove existing contact entries.
+✅ **Create Contact** — Add new contacts with validation to ensure unique phone numbers and email addresses.  
+🔍 **Search Contact** — Search by name, phone number, or email with **exact or partial match** options.  
+✏️ **Edit & Delete** — Modify or safely remove existing contact entries.  
+📋 **List All Contacts** — Display all saved contacts in a structured table view. Supports sorting by **Name**, **Number**, or **Email**.  
+💾 **Persistent Storage** — Automatically saves all contact data to `contacts.csv` and loads it at startup.  
 
--> List All Contacts: Display all stored contacts in a clean, tabular format. This feature also allows you to sort contacts by name, number, or email for better organization.
+---
 
--> Persistent Storage: The system automatically loads contacts from a contacts.csv file on startup and can save all current contacts to the same file, ensuring your data is always safe.
+## 🛠️ How to Compile and Run
 
------------------------------------------------------------------------------------------------------------
-🛠️ How to Compile and Run
------------------------------------------------------------------------------------------------------------
+Follow these simple steps to get started:
 
-To get the program running, follow these simple steps:
+### 1️⃣ Open a Terminal
+Navigate to your project directory containing all source files.
 
--> Open a Terminal: Navigate to the project directory containing the source files.
+### 2️⃣ Compile the Program
+Use GCC to compile all source files:
 
--> Compile: Use a C compiler like GCC to compile all source files into a single executable.
-
-Bash
-
+```bash
 gcc main.c contact.c searchSortEdit.c file.c -o addressbook
-Run: Execute the compiled program from the terminal.
+```
 
-Bash
+### 3️⃣ Run the Program
+Execute the compiled file:
 
+```bash
 ./addressbook
-The program will launch and present you with the main menu, guiding you through all available options.
+```
 
------------------------------------------------------------------------------------------------------------
-📂 Project Structure
------------------------------------------------------------------------------------------------------------
+Once launched, the main menu will guide you through all operations.
 
-The project code is organized into separate files to enhance modularity and readability:
+---
 
--> main.c: Contains the main program loop and user interface.
+## 🖼️ Demo Screenshot
 
--> contact.c & contact.h: Handles the core logic for managing contacts, including the data structures and validation functions.
+> Add a terminal screenshot of your program here (optional but highly recommended!)
 
--> searchSortEdit.c: Manages the implementation of all search, sort, edit, and delete functionalities.
+You can capture the program’s output using your terminal and place it in your project folder (for example: `demo.png`).
 
--> file.c & file.h: Contains all functions related to file handling for saving and loading data.
+```markdown
+![Demo Screenshot](demo.png)
+```
 
--> contacts.csv: The data file where all contact information is stored.
+Example:
+![Demo Screenshot](https://user-images.githubusercontent.com/00000000/000000000-demo-example.png)
+
+---
+
+## 📂 Project Structure
+
+| File | Description |
+|------|--------------|
+| **main.c** | Contains the main menu loop and controls overall program flow. |
+| **contact.c / contact.h** | Defines the `Contact` structure and core logic for adding and validating contacts. |
+| **searchSortEdit.c** | Implements searching, sorting, editing, and deleting functionalities. |
+| **file.c / file.h** | Manages file operations for saving/loading data from `contacts.csv`. |
+| **contacts.csv** | CSV file that stores all contact data persistently. |
+
+---
+
+## 🧱 Example Usage
+
+```text
+===============================
+   ADDRESS BOOK MANAGEMENT
+===============================
+1. Create Contact
+2. Search Contact
+3. Edit Contact
+4. Delete Contact
+5. List All Contacts
+6. Exit
+Enter your choice: _
+```
+
+---
+
+## 🧩 Concepts Demonstrated
+
+- Modular Programming in C  
+- File Handling (`fopen`, `fread`, `fprintf`, etc.)  
+- Dynamic Data Management using Structures  
+- Data Validation and String Manipulation  
+- Menu-driven Console Interface  
+
+---
+
+## 🔮 Future Enhancements
+
+- Contact grouping (e.g., Friends, Family, Work)  
+- JSON or Binary File Storage options  
+- Import/Export contact functionality  
+- Enhanced UI with colors and formatting  
+- Add backup and restore options  
+
+---
+
+## 👨‍💻 Author
+
+**Omkar Sawant**  
+📍 Bengaluru, Karnataka, India  
+💼 [GitHub Profile](https://github.com/OmkarSawant25)  
+📧 omkarsawant25@example.com *(optional)*  
+
+---
+
+## 🪪 License
+
+This project is open-source and available under the **MIT License**.  
+You are free to use, modify, and distribute it under the same terms.
+
+---
+
+⭐ **If you like this project, consider giving it a star on GitHub!**

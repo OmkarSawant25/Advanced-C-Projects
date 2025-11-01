@@ -1,3 +1,77 @@
+/*
+===============================================================================
+Project Title : LSB Image Stegnography
+Name          : Omkar Ashok Sawant
+Batch Id      : 25021C_309
+Date          : 28/10/2025
+Language      : C Programming
+===============================================================================
+
+📘 Project Overview
+
+This project implements image steganography using the Least Significant Bit (LSB) technique in the C programming language.
+It allows users to hide (encode) a secret text or code file inside a (.bmp) image and 
+later extract (decode) the hidden information safely without visible distortion of the image.
+
+The system supports multiple file types (e.g .txt, .c, .h, .sh) and performs full data integrity checks during encoding and decoding.
+
+🧩 Features
+
+* 🔒 Secure Data Hiding using LSB bit manipulation.
+* 🖼️ Supports 24-bit BMP images.
+* 📄 Handles multiple file types (.txt, .c, .h, .sh).
+* ✅ Robust validation for file names, extensions, and image capacity.
+* 🔍 Magic string verification to ensure correct decoding.
+* 🧠 Modular C code with clear function separation for readability.
+* 💡 Detailed console messages for easy debugging and understanding.
+
+🧮 Encoding Steps
+
+1. Validate Input Files
+   * Source image must be .bmp
+   * Secret file can be .txt, .c, .h, .sh
+2. Open Required Files (src.bmp, secret.txt, stego.bmp)
+3. Check Capacity — Ensure image can hold the secret data.
+4. Copy BMP Header (first 54 bytes unchanged)
+5. Encode the following sequentially:
+   * Magic string (e.g., "#*")
+   * Secret file extension size
+   * Secret file extension (e.g., .txt)
+   * Secret file size
+   * Secret file data (actual contents)
+6. Copy Remaining Image Data after encoding.
+7. Output: Stego image ('destination.bmp') containing the hidden data.
+
+🔍 Decoding Steps
+
+1. Validate and Open Stego Image
+2. Skip BMP Header (54 bytes)
+3. Read and Verify Magic String
+4. Decode Extension Size
+5. Decode Extension Name
+6. Decode Secret File Size
+7. Extract Secret File Data and write to decoded file.
+
+⚠️ Error Handling
+
+* Invalid file names or extensions are reported.
+* Missing arguments or corrupted BMP files trigger descriptive error messages.
+* Magic string mismatch ensures you don’t decode unencoded files.
+
+🧩 Future Enhancements
+
+* Support for other image formats (PNG, JPEG).
+* Password-based encryption before embedding.
+* GUI-based front-end for user interaction.
+* Batch encoding of multiple files.
+
+🧭 Command Format
+
+./a.out -e <source_image.bmp> <secret_file.txt> [output_image.bmp]
+./a.out -d <stego_image.bmp> [output_file_name]
+
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include "encode.h"
@@ -14,7 +88,7 @@ int main(int argc, char *argv[])
     printf("========================================\n\n");
 
     // Step 1: Check for minimum argument count
-    if (argc >= 3)
+    if (argc >= 4)
     {
         // Step 2: Check whether encode or decode
         OperationType op_type = check_operation_type(argv[1]);
@@ -31,7 +105,6 @@ int main(int argc, char *argv[])
             // Step 4: Validate and read encode arguments
             if (read_and_validate_encode_args(argv, &enc_info) == e_success)
             {
-                // printf("Encode arguments validated successfully.\n");
                 printf("-> Encode arguments validated successfully.\n");
 
                 // Step 5: Call do_encoding
@@ -50,6 +123,7 @@ int main(int argc, char *argv[])
                 printf("❌ ERROR: Invalid encode arguments.\n");
             }
         }
+
         /*------- DECODING SECTION -------*/
 
         else if (op_type == e_decode)
@@ -98,8 +172,11 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("❌ ERROR: Unsupported operation type.\n");
-            printf("Use -e for encode or -d for decode.\n");
+            printf("❌ ERROR: Unsupported operation type.\n\n");
+            printf("Use -e for encode or -d for decode.\n\n");
+            printf("Usage:\n");
+            printf(" 🔎 To Encode: %s -e <source_image.bmp> <secret_file.txt> [output_image.bmp]\n", argv[0]);
+            printf(" 🔎 To Decode: %s -d <stego_image.bmp> [output_file_name]\n", argv[0]);
         }
     }
 

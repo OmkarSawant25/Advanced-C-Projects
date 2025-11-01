@@ -23,11 +23,11 @@ uint get_image_size_for_bmp(FILE *fptr_image)
 
     // Read the width (integer - 4 bytes)
     fread(&width, sizeof(int), 1, fptr_image);
-    printf("           Width = %u\n", width);
+    // printf("           Width = %u\n", width);
 
     // Read the height (integer - 4 bytes)
     fread(&height, sizeof(int), 1, fptr_image);
-    printf("           Height = %u\n", height);
+    // printf("           Height = %u\n", height);
 
     // Return image capacity = width * height * 3 bytes
     return width * height * 3;
@@ -89,7 +89,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
     }
     else
     {
-        fprintf(stderr, "Error: Invalid source file '%s'. Must be a .bmp file.\n", argv[2]);
+        fprintf(stderr, "Error: Invalid source file '%s'. Must be a .bmp file.\n\n", argv[2]);
         return e_failure;
     }
 
@@ -101,7 +101,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
     }
     else
     {
-        fprintf(stderr, "Error: Invalid secret file '%s'. Must be .txt, .c, .h, or .sh.\n", argv[3]);
+        fprintf(stderr, "Error: Invalid secret file '%s'. Must be .txt, .c, .h, or .sh.\n\n", argv[3]);
         return e_failure;
     }
 
@@ -118,7 +118,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
         }
         else
         {
-            fprintf(stderr, "Error: Invalid output file '%s'. Must be a .bmp file.\n", argv[4]);
+            fprintf(stderr, "Error: Invalid output file '%s'. Must be a .bmp file.\n\n", argv[4]);
             return e_failure;
         }
     }

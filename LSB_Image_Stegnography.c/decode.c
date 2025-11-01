@@ -31,7 +31,7 @@ Status validate_file_extension_decode(const char *filename, char *valid_extns[],
             return e_success;
     }
 
-    fprintf(stderr, "Error: '%s' has invalid extension.\n", filename);
+    // fprintf(stderr, "Error: '%s' has invalid extension.\n", filename);
     return e_failure;
 }
 
@@ -51,7 +51,8 @@ Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo)
     }
     else
     {
-        printf("Error: '%s' has invalid extension.\n", argv[2]);
+        printf("Error: '%s' has invalid extension. Must be a .bmp file.\n\n", argv[2]);
+        return e_failure;
     }
 
     // If user didn’t give an output file name, use “Decoded” by default
