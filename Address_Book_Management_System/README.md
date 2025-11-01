@@ -49,19 +49,19 @@ Once launched, the main menu will guide you through all operations.
 Below are some sample screenshots showing different operations of the Address Book Management System:
 
 ### 🆕 Create Contact
-![Create Contact](outputs/CreateContact.png)
+![Create Contact](Outputs/CreateContact.png)
 
 ### 🔍 Search Contact
-![Search Contact](outputs/SearchContact.png)
+![Search Contact](Outputs/SearchContact.png)
 
 ### 📋 View All Contacts
-![View Contacts](outputs/ViewContact.png)
+![View Contacts](Outputs/ViewContact.png)
 
 ### ✏️ Edit Contact
-![Edit Contact](outputs/EditContact.png)
+![Edit Contact](Outputs/EditContact.png)
 
 ### 💾 Save & Exit
-![Save and Exit](outputs/Save&Exit.png)
+![Save and Exit](Outputs/Save&Exit.png)
 
 
 ---
