@@ -44,18 +44,25 @@ Once launched, the main menu will guide you through all operations.
 
 ---
 
-## 🖼️ Demo Screenshot
+## 📸 Program Outputs
 
-> Add a terminal screenshot of your program here (optional but highly recommended!)
+Below are some sample screenshots showing different operations of the Address Book Management System:
 
-You can capture the program’s output using your terminal and place it in your project folder (for example: `demo.png`).
+### 🆕 Create Contact
+![Create Contact](outputs/CreateContact.png)
 
-```markdown
-![Demo Screenshot](demo.png)
-```
+### 🔍 Search Contact
+![Search Contact](outputs/SearchContact.png)
 
-Example:
-![Demo Screenshot](https://user-images.githubusercontent.com/00000000/000000000-demo-example.png)
+### 📋 View All Contacts
+![View Contacts](outputs/ViewContact.png)
+
+### ✏️ Edit Contact
+![Edit Contact](outputs/EditContact.png)
+
+### 💾 Save & Exit
+![Save and Exit](outputs/Save&Exit.png)
+
 
 ---
 
