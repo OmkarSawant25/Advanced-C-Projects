@@ -123,11 +123,4 @@ Enter your choice: _
 
 ---
 
-## 🪪 License
-
-This project is open-source and available under the **MIT License**.  
-You are free to use, modify, and distribute it under the same terms.
-
----
-
 ⭐ **If you like this project, consider giving it a star on GitHub!**
