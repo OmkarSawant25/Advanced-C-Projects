@@ -3,7 +3,7 @@
 Project Title : LSB Image Stegnography
 Name          : Omkar Ashok Sawant
 Batch Id      : 25021C_309
-Date          : 28/10/2025
+Date          : 03/11/2025
 Language      : C Programming
 ===============================================================================
 

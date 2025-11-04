@@ -14,7 +14,7 @@ void skip_header_files(Lexical *lexi, char *ch)
     *ch = fgetc(lexi->fptr);
 }
 
-int is_keyword(Lexical *lexi, const char *word)
+int is_keyword(Lexical *lexi, char *word)
 {
     for (int i = 0; i < lexi->keyword_count; i++)
     {
@@ -71,6 +71,67 @@ Status start_lexical_analysis(Lexical *lexi)
         {
             i = 0;
             int has_dot = 0;
+            int is_hex = 0;
+            int is_octal = 0;
+            int is_binary = 0;
+
+            // Check for Hexadecimal or Octal
+            if (ch == '0')
+            {
+                buffer[i++] = ch;
+                ch = fgetc(lexi->fptr);
+
+                if (ch == 'x' || ch == 'X')
+                {
+                    is_hex = 1;
+                    buffer[i++] = ch;
+                    ch = fgetc(lexi->fptr);
+
+                    while (isxdigit(ch))
+                    {
+                        buffer[i++] = ch;
+                        ch = fgetc(lexi->fptr);
+                    }
+                    buffer[i] = '\0';
+                    printf("Numeric constant\t:\t%s\n", buffer);
+                    continue;
+                }
+                else if (ch == 'b')
+                {
+                    is_binary = 1;
+                    buffer[i++] = ch;
+                    ch = fgetc(lexi->fptr);
+
+                    while (ch == '0' || ch == '1')
+                    {
+                        buffer[i++] = ch;
+                        ch = fgetc(lexi->fptr);
+                    }
+                    buffer[i] = '\0';
+                    printf("Numeric constant\t:\t%s\n", buffer);
+                    continue;
+                }
+                else if (isdigit(ch))
+                {
+                    is_octal = 1;
+                    while (ch >= '0' && ch <= '7')
+                    {
+                        buffer[i++] = ch;
+                        ch = fgetc(lexi->fptr);
+                    }
+                    buffer[i] = '\0';
+                    printf("Numeric constant\t:\t%s\n", buffer);
+                    continue;
+                }
+                // If just '0' alone
+                else
+                {
+                    buffer[i] = '\0';
+                    printf("Numeric constant\t:\t%s\n", buffer);
+                    continue;
+                }
+            }
+
             while (isdigit(ch) || ch == '.')
             {
                 if (ch == '.')
@@ -182,7 +243,7 @@ Status start_lexical_analysis(Lexical *lexi)
                 printf("Operator\t\t:\t%c%c\n", ch, next);
                 ch = fgetc(lexi->fptr);
             }
-            else if ((ch == '+' && next == '+') || (ch == '-' && next == '-'))
+            else if ((ch == '+' && next == '+') || (ch == '-' && next == '-') || (ch == '&' && next == '&') || (ch == '|' && next == '|'))
             {
                 printf("Operator\t\t:\t%c%c\n", ch, next);
                 ch = fgetc(lexi->fptr);
