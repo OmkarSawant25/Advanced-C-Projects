@@ -3,47 +3,65 @@
 #include "types.h"
 #include "lexical.h"
 
+/* ===== COLOR CODES ===== */
+#define RESET   "\033[0m"
+#define RED     "\033[1;31m"
+#define GREEN   "\033[1;32m"
+#define YELLOW  "\033[1;33m"
+#define BLUE    "\033[1;34m"
+#define CYAN    "\033[1;36m"
+#define MAGENTA "\033[1;35m"
+#define WHITE   "\033[1;37m"
+
 int main(int argc, char *argv[])
 {
     Lexical lexi;
     Status status;
 
-    printf("\n========================================\n");
-    printf("       Lexical Analyzer (C Project)     \n");
-    printf("========================================\n\n");
+    /* Header with colors */
+    printf("\n%s========================================%s\n", CYAN, RESET);
+    printf("%s       Lexical Analyzer (C Project)     %s\n", BLUE, RESET);
+    printf("%s========================================%s\n\n", CYAN, RESET);
 
+    /* Argument check */
     if (argc != 2)
     {
-        printf("Error: Invalid number of argument passed.\n");
-        printf("Usage: ./a.out <file_name.c>\n");
+        printf("%s❌ Error:%s Invalid number of arguments passed.\n", RED, RESET);
+        printf("%sUsage:%s ./a.out <file_name.c>\n", YELLOW, RESET);
         exit(1);
     }
 
+    /* Validate input filename */
     status = read_and_validation_args(argv, &lexi);
     if (status == e_failure)
     {
-        printf("\n❌ Error: Unable to read or validate input file.\n");
+        printf("\n%s❌ Error:%s Unable to read or validate input file.\n", RED, RESET);
         return 1;
     }
 
+    /* Open file */
     status = open_file(&lexi);
     if (status == e_failure)
     {
-        printf("❌ Error: Unable to open file.\n");
+        printf("%s❌ Error:%s Unable to open file.\n", RED, RESET);
         return 1;
     }
 
+    /* Load keywords */
     keyword(&lexi);
 
+    /* Start lexical analysis */
     status = start_lexical_analysis(&lexi);
     if (status == e_failure)
     {
-        printf("❌ Error: Lexical analysis Failed.\n");
+        printf("%s❌ Error:%s Lexical analysis failed.\n", RED, RESET);
         return 1;
     }
 
     fclose(lexi.fptr);
-    printf("\n✅ Lexical analysis completed successfully.\n");
+
+    /* Success */
+    printf("\n%s✅ Lexical analysis completed successfully.%s\n", GREEN, RESET);
 
     return 0;
 }

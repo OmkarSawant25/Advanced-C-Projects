@@ -3,17 +3,70 @@
 #include <ctype.h>
 #include "lexical.h"
 #include "types.h"
+#include "error_handler.h"
 
-void skip_header_files(Lexical *lexi, char *ch)
+#define BUF_SIZE 256
+
+#define RESET "\033[0m"
+#define RED "\033[1;31m"
+#define GREEN "\033[1;32m"
+#define YELLOW "\033[1;33m"
+#define BLUE "\033[1;34m"
+#define MAGENTA "\033[1;35m"
+#define CYAN "\033[1;36m"
+#define WHITE "\033[1;37m"
+
+/* ===== NEON COLORS (256-COLOR ATTRACTIVE THEME) ===== */
+#define NEON_KEYWORD "\033[1;38;5;39m"    // Electric Cyan
+#define NEON_IDENTIFIER "\033[1;38;5;45m" // Neon Aqua
+#define NEON_NUMERIC "\033[1;38;5;82m"    // Bright Neon Green
+#define NEON_FLOAT "\033[1;38;5;118m"     // Light Neon Green
+#define NEON_STRING "\033[1;38;5;207m"    // Hot Pink Neon
+#define NEON_CHAR "\033[1;38;5;171m"      // Purple-Pink Neon
+#define NEON_OPERATOR "\033[1;38;5;226m"  // Neon Yellow
+#define NEON_SYMBOL "\033[1;38;5;208m"    // Neon Orange
+#define NEON_WHITE "\033[1;37m"
+
+/* Print with COLORS */
+static void print_token(const char *type, const char *lexeme)
+{
+    const char *color;
+
+    if (strcmp(type, "Keyword") == 0)
+        color = NEON_KEYWORD;
+    else if (strcmp(type, "Identifier") == 0)
+        color = NEON_IDENTIFIER;
+    else if (strcmp(type, "Numeric constant") == 0)
+        color = NEON_NUMERIC;
+    else if (strcmp(type, "Float constant") == 0)
+        color = NEON_FLOAT;
+    else if (strcmp(type, "String literal") == 0)
+        color = NEON_STRING;
+    else if (strcmp(type, "Character const") == 0)
+        color = NEON_CHAR;
+    else if (strcmp(type, "Operator") == 0)
+        color = NEON_OPERATOR;
+    else if (strcmp(type, "Symbol") == 0)
+        color = NEON_SYMBOL;
+    else
+        color = NEON_WHITE;
+
+    printf("%s%-20s : %s%s%s\n", color, type, color, lexeme, RESET);
+}
+
+/* UPDATED: skip header, update line */
+void skip_header_files(Lexical *lexi, int *ch, int *line)
 {
     while (*ch != '\n' && *ch != EOF)
-    {
         *ch = fgetc(lexi->fptr);
-    }
+
+    if (*ch == '\n')
+        (*line)++;
 
     *ch = fgetc(lexi->fptr);
 }
 
+/* Keyword check */
 int is_keyword(Lexical *lexi, char *word)
 {
     for (int i = 0; i < lexi->keyword_count; i++)
@@ -24,35 +77,46 @@ int is_keyword(Lexical *lexi, char *word)
     return 0;
 }
 
+/* MAIN LEXICAL ANALYZER */
 Status start_lexical_analysis(Lexical *lexi)
 {
-    char ch, next;
-    char buffer[100];
+    int ch, next;
+    char buffer[BUF_SIZE];
     int i;
+    int line = 1;
 
-    printf("TOKENS FOUND:\n");
-    printf("-------------------------------------------------\n");
+    printf(YELLOW "TOKENS FOUND:\n" RESET);
+    printf(YELLOW "-------------------------------------------------\n" RESET);
 
     ch = fgetc(lexi->fptr);
 
     while (ch != EOF)
     {
-        if (ch == '#')
+        if (ch == '\n')
         {
-            skip_header_files(lexi, &ch);
+            line++;
+            ch = fgetc(lexi->fptr);
             continue;
         }
+
         if (isspace(ch))
         {
             ch = fgetc(lexi->fptr);
             continue;
         }
 
-        // Identifier or Keyword
+        /* PREPROCESSOR */
+        if (ch == '#')
+        {
+            skip_header_files(lexi, &ch, &line);
+            continue;
+        }
+
+        /* IDENTIFIER OR KEYWORD */
         if (isalpha(ch) || ch == '_')
         {
             i = 0;
-            while (isalpha(ch) || isdigit(ch) || ch == '_')
+            while (isalnum(ch) || ch == '_')
             {
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
@@ -60,165 +124,124 @@ Status start_lexical_analysis(Lexical *lexi)
             buffer[i] = '\0';
 
             if (is_keyword(lexi, buffer))
-                printf("Keyword\t\t\t:\t%s\n", buffer);
+                print_token("Keyword", buffer);
             else
-                printf("Identifier\t\t:\t%s\n", buffer);
+                print_token("Identifier", buffer);
+
             continue;
         }
 
-        // Numeric Constant
-        else if (isdigit(ch))
+        /* NUMERIC CONSTANT */
+        if (isdigit(ch))
         {
             i = 0;
             int has_dot = 0;
-            int is_hex = 0;
-            int is_octal = 0;
-            int is_binary = 0;
-
-            // Check for Hexadecimal or Octal
-            if (ch == '0')
-            {
-                buffer[i++] = ch;
-                ch = fgetc(lexi->fptr);
-
-                if (ch == 'x' || ch == 'X')
-                {
-                    is_hex = 1;
-                    buffer[i++] = ch;
-                    ch = fgetc(lexi->fptr);
-
-                    while (isxdigit(ch))
-                    {
-                        buffer[i++] = ch;
-                        ch = fgetc(lexi->fptr);
-                    }
-                    buffer[i] = '\0';
-                    printf("Numeric constant\t:\t%s\n", buffer);
-                    continue;
-                }
-                else if (ch == 'b')
-                {
-                    is_binary = 1;
-                    buffer[i++] = ch;
-                    ch = fgetc(lexi->fptr);
-
-                    while (ch == '0' || ch == '1')
-                    {
-                        buffer[i++] = ch;
-                        ch = fgetc(lexi->fptr);
-                    }
-                    buffer[i] = '\0';
-                    printf("Numeric constant\t:\t%s\n", buffer);
-                    continue;
-                }
-                else if (isdigit(ch))
-                {
-                    is_octal = 1;
-                    while (ch >= '0' && ch <= '7')
-                    {
-                        buffer[i++] = ch;
-                        ch = fgetc(lexi->fptr);
-                    }
-                    buffer[i] = '\0';
-                    printf("Numeric constant\t:\t%s\n", buffer);
-                    continue;
-                }
-                // If just '0' alone
-                else
-                {
-                    buffer[i] = '\0';
-                    printf("Numeric constant\t:\t%s\n", buffer);
-                    continue;
-                }
-            }
 
             while (isdigit(ch) || ch == '.')
             {
+                if (ch == '.' && has_dot)
+                    break;
                 if (ch == '.')
-                {
-                    if (has_dot)
-                        break;
                     has_dot = 1;
-                }
+
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
             }
             buffer[i] = '\0';
 
             if (has_dot)
-                printf("Float constant\t\t:\t%s\n", buffer);
+                print_token("Float constant", buffer);
             else
-                printf("Numeric constant\t:\t%s\n", buffer);
+                print_token("Numeric constant", buffer);
+
             continue;
         }
 
-        // String Literal
-        else if (ch == '\"')
+        /* STRING LITERAL */
+        if (ch == '"')
         {
             i = 0;
             buffer[i++] = ch;
             ch = fgetc(lexi->fptr);
-            while (ch != EOF && ch != '\"')
+
+            while (ch != '"' && ch != '\n' && ch != EOF)
             {
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
             }
-            if (ch == '\"')
-            {
-                buffer[i++] = '\"';
-                buffer[i] = '\0';
-                printf("String literal\t\t:\t%s\n", buffer);
-                ch = fgetc(lexi->fptr);
-            }
+
+            if (ch == '\n' || ch == EOF)
+                lexical_error("Unterminated string literal", line);
+
+            buffer[i++] = '"';
+            buffer[i] = '\0';
+
+            print_token("String literal", buffer);
+            ch = fgetc(lexi->fptr);
             continue;
         }
 
-        // Character Constant
-        else if (ch == '\'')
+        /* CHARACTER LITERAL */
+        if (ch == '\'')
         {
             i = 0;
             buffer[i++] = ch;
             ch = fgetc(lexi->fptr);
+
+            if (ch == '\n' || ch == EOF)
+                lexical_error("Unterminated character literal", line);
 
             if (ch == '\\')
             {
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
+
+                if (ch == '\n' || ch == EOF)
+                    lexical_error("Invalid escape sequence", line);
+
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
             }
-            else if (ch != EOF)
+            else
             {
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
             }
 
-            if (ch == '\'')
-            {
-                buffer[i++] = '\'';
-                buffer[i] = '\0';
-                printf("Character const\t\t:\t%s\n", buffer);
-                ch = fgetc(lexi->fptr);
-            }
+            if (ch != '\'')
+                lexical_error("Unterminated character literal", line);
+
+            buffer[i++] = '\'';
+            buffer[i] = '\0';
+
+            print_token("Character const", buffer);
+
+            ch = fgetc(lexi->fptr);
             continue;
         }
 
-        // Comments or Division
-        else if (ch == '/')
+        /* COMMENTS OR DIVISION */
+        if (ch == '/')
         {
             next = fgetc(lexi->fptr);
+
             if (next == '/')
             {
-                while ((ch = fgetc(lexi->fptr)) != EOF && ch != '\n')
+                while ((ch = fgetc(lexi->fptr)) != '\n' && ch != EOF)
                     ;
+                if (ch == '\n')
+                    line++;
                 ch = fgetc(lexi->fptr);
                 continue;
             }
-            else if (next == '*')
+
+            if (next == '*')
             {
-                char prev = 0;
+                int prev = 0;
                 while ((ch = fgetc(lexi->fptr)) != EOF)
                 {
+                    if (ch == '\n')
+                        line++;
                     if (prev == '*' && ch == '/')
                         break;
                     prev = ch;
@@ -226,58 +249,57 @@ Status start_lexical_analysis(Lexical *lexi)
                 ch = fgetc(lexi->fptr);
                 continue;
             }
-            else
-            {
-                printf("Operator\t\t:\t/\n");
-                ch = next;
-                continue;
-            }
+
+            print_token("Operator", "/");
+            ch = next;
+            continue;
         }
 
-        // Operators
-        else if (strchr("+-*=<>!&|%^", ch))
+        /* OPERATORS */
+        if (strchr("+-*=<>!&|%^", ch))
         {
             next = fgetc(lexi->fptr);
-            if (next == '=')
+
+            if (next == '=' ||
+                (ch == '+' && next == '+') ||
+                (ch == '-' && next == '-') ||
+                (ch == '&' && next == '&') ||
+                (ch == '|' && next == '|'))
             {
-                printf("Operator\t\t:\t%c%c\n", ch, next);
-                ch = fgetc(lexi->fptr);
-            }
-            else if ((ch == '+' && next == '+') || (ch == '-' && next == '-') || (ch == '&' && next == '&') || (ch == '|' && next == '|'))
-            {
-                printf("Operator\t\t:\t%c%c\n", ch, next);
+                char op[3] = {ch, next, '\0'};
+                print_token("Operator", op);
                 ch = fgetc(lexi->fptr);
             }
             else
             {
-                printf("Operator\t\t:\t%c\n", ch);
+                char op[2] = {ch, '\0'};
+                print_token("Operator", op);
                 ch = next;
             }
             continue;
         }
 
-        // Symbols
-        else if (strchr(";,{}()[]#", ch))
+        /* SYMBOLS */
+        if (strchr(";,{}()[]#", ch))
         {
-            printf("Symbol\t\t\t:\t%c\n", ch);
+            char sym[2] = {ch, '\0'};
+            print_token("Symbol", sym);
             ch = fgetc(lexi->fptr);
             continue;
         }
 
-        // Skip unknowns
-        else
-        {
-            ch = fgetc(lexi->fptr);
-        }
+        /* UNKNOWN CHARACTER */
+        lexical_error_char(ch, line);
     }
 
-    printf("-------------------------------------------------\n");
+    printf(YELLOW "-------------------------------------------------\n" RESET);
     return e_success;
 }
 
+/* ADD KEYWORDS */
 void keyword(Lexical *lexi)
 {
-    const char *temp_keywords[32] = {
+    const char *kw[] = {
         "auto", "break", "case", "char", "const", "continue", "default",
         "do", "double", "else", "enum", "extern", "float", "for", "goto",
         "if", "int", "long", "register", "return", "short", "signed",
@@ -285,10 +307,12 @@ void keyword(Lexical *lexi)
         "unsigned", "void", "volatile", "while"};
 
     for (int i = 0; i < 32; i++)
-        strcpy(lexi->keywords[i], temp_keywords[i]);
+        strcpy(lexi->keywords[i], kw[i]);
 
     lexi->keyword_count = 32;
 }
+
+/* MISSING FUNCTIONS ADDED BACK */
 
 Status read_and_validation_args(char *argv[], Lexical *lexi)
 {
@@ -299,8 +323,7 @@ Status read_and_validation_args(char *argv[], Lexical *lexi)
     }
 
     char *dot = strrchr(argv[1], '.');
-
-    if (dot == NULL)
+    if (!dot)
     {
         fprintf(stderr, "Error: File '%s' has no extension.\n", argv[1]);
         return e_failure;
@@ -319,10 +342,9 @@ Status read_and_validation_args(char *argv[], Lexical *lexi)
 Status open_file(Lexical *lexi)
 {
     lexi->fptr = fopen(lexi->fname, "r");
-    if (lexi->fptr == NULL)
+    if (!lexi->fptr)
     {
         perror("fopen");
-        fprintf(stderr, "ERROR: Unable to open file %s\n", lexi->fname);
         return e_failure;
     }
     return e_success;

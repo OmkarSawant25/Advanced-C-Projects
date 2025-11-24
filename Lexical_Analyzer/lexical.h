@@ -12,18 +12,12 @@ typedef struct _Lexical
     int keyword_count;
 } Lexical;
 
-// Token representation
-typedef struct
-{
-    char lexeme[50];
-    char type[20];
-} Token;
-
 void keyword(Lexical *lexi);
 Status read_and_validation_args(char *argv[], Lexical *lexi);
 Status open_file(Lexical *lexi);
 Status start_lexical_analysis(Lexical *lexi);
+
 int is_keyword(Lexical *lexi, char *word);
-void skip_header_files(Lexical *lexi, char *ch);
+void skip_header_files(Lexical *lexi, int *ch, int *line);
 
 #endif
