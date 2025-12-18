@@ -4,7 +4,7 @@
 /* User defined types */
 typedef unsigned int uint;
 
-/* Status will be used in fn. return type */
+/* Status will be used in function return type */
 typedef enum
 {
     e_failure,

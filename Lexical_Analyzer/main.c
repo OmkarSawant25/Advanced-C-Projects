@@ -15,15 +15,15 @@
 
 int main(int argc, char *argv[])
 {
-    Lexical lexi;
-    Status status;
+    Lexical lexi;     // Lexical analyzer object
+    Status status;    // Function status
 
-    /* Header with colors */
-    printf("\n%s========================================%s\n", CYAN, RESET);
+    /* Project banner */
+    printf("\n%s============================================%s\n", CYAN, RESET);
     printf("%s       Lexical Analyzer (C Project)     %s\n", BLUE, RESET);
-    printf("%s========================================%s\n\n", CYAN, RESET);
+    printf("%s============================================%s\n\n", CYAN, RESET);
 
-    /* Argument check */
+    /* Check argument count */
     if (argc != 2)
     {
         printf("%s❌ Error:%s Invalid number of arguments passed.\n", RED, RESET);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    /* Validate input filename */
+    /* Validate input file */
     status = read_and_validation_args(argv, &lexi);
     if (status == e_failure)
     {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    /* Open file */
+    /* Open source file */
     status = open_file(&lexi);
     if (status == e_failure)
     {
@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    /* Load keywords */
+    /* Load C keywords */
     keyword(&lexi);
 
-    /* Start lexical analysis */
+    /* Start analysis */
     status = start_lexical_analysis(&lexi);
     if (status == e_failure)
     {
@@ -58,10 +58,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    fclose(lexi.fptr);
+    fclose(lexi.fptr);   // Close file
 
-    /* Success */
+    /* Success message */
     printf("\n%s✅ Lexical analysis completed successfully.%s\n", GREEN, RESET);
+    printf("%s============================================%s\n\n", CYAN, RESET);
+
 
     return 0;
 }
