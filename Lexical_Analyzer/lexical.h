@@ -19,5 +19,6 @@ Status start_lexical_analysis(Lexical *lexi);
 
 int is_keyword(Lexical *lexi, char *word);
 void skip_header_files(Lexical *lexi, int *ch, int *line);
+void print_token(char *type, char *lexeme);
 
 #endif

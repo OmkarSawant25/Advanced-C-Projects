@@ -12,20 +12,20 @@
 
 int main()
 {
-    int a = 10;           // Decimal constant
-    float b = 12.34;      // Floating constant
-    int c = 075;          // Octal constant
-    int d = 0x1A3F;       // Hexadecimal constant
-    char e = 'A';         // Character constant
-    char f = '\n';        // Escape character constant
+    int a = 10;      // Decimal constant
+    float b = 12.34; // Floating constant
+    int c = 075;     // Octal constant
+    int d = 0x1A3F;  // Hexadecimal constant
+    char e = 'A';    // Character constant
+    char f = '\n';   // Escape character constant
     int g = 0b101010101;
     char str[] = "Hello, World!"; // String literal
 
     // Operators
-    a++;          // Increment
-    b -= 2.5;     // Compound operator
-    c = a + b;    // Arithmetic
-    d *= c;       // Multiplication assignment
+    a++;       // Increment
+    b -= 2.5;  // Compound operator
+    c = a + b; // Arithmetic
+    d *= c;    // Multiplication assignment
     if (a >= b && c != d)
     {
         printf("a = %d, b = %f\n", a, b);

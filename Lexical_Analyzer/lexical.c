@@ -4,45 +4,19 @@
 #include "lexical.h"
 #include "types.h"
 
-#define BUF_SIZE 256   // Buffer size for tokens
+#define BUF_SIZE 256 // Buffer size for tokens
 
-/* SIMPLE COLORS */
-#define RESET   "\033[0m"
-#define YELLOW  "\033[1;33m"
-#define KEYWORD_COLOR     "\033[1;34m"  // Keywords
-#define IDENTIFIER_COLOR  "\033[0;36m"  // Identifiers
-#define NUMBER_COLOR      "\033[0;32m"  // Numbers
-#define STRING_COLOR      "\033[0;35m"  // Strings
-#define CHAR_COLOR        "\033[0;33m"  // Characters
-#define OPERATOR_COLOR    "\033[1;31m"  // Operators
-#define SYMBOL_COLOR      "\033[1;37m"  // Symbols
-#define DEFAULT_COLOR     "\033[0m"
-
-/* Print token with color */
-void print_token(const char *type, const char *lexeme)
+void print_token(char *type, char *lexeme)
 {
-    const char *color = DEFAULT_COLOR;
-
-    if (strcmp(type, "Keyword") == 0)
-        color = KEYWORD_COLOR;
-    else if (strcmp(type, "Identifier") == 0)
-        color = IDENTIFIER_COLOR;
-    else if (strcmp(type, "Numeric constant") == 0 ||
-             strcmp(type, "Float constant") == 0)
-        color = NUMBER_COLOR;
-    else if (strcmp(type, "String literal") == 0)
-        color = STRING_COLOR;
-    else if (strcmp(type, "Character const") == 0)
-        color = CHAR_COLOR;
-    else if (strcmp(type, "Operator") == 0)
-        color = OPERATOR_COLOR;
-    else if (strcmp(type, "Symbol") == 0)
-        color = SYMBOL_COLOR;
-
-    printf("%s%-20s : %s%s%s\n", color, type, color, lexeme, RESET);
+    printf("%-20s :\t%s\n", type, lexeme);
 }
 
-/* Skip preprocessor directives */
+void print_error_token(const char *msg, int line)
+{
+    printf("\n%s %d\n", msg, line);
+}
+
+// Skip preprocessor directives
 void skip_header_files(Lexical *lexi, int *ch, int *line)
 {
     while (*ch != '\n' && *ch != EOF)
@@ -54,7 +28,7 @@ void skip_header_files(Lexical *lexi, int *ch, int *line)
     *ch = fgetc(lexi->fptr);
 }
 
-/* Check for keyword */
+// Check for keyword
 int is_keyword(Lexical *lexi, char *word)
 {
     for (int i = 0; i < lexi->keyword_count; i++)
@@ -65,22 +39,26 @@ int is_keyword(Lexical *lexi, char *word)
     return 0;
 }
 
-/* Start lexical analysis */
+// Start lexical analysis
 Status start_lexical_analysis(Lexical *lexi)
 {
     int ch, next;
     char buffer[BUF_SIZE];
     int i;
     int line = 1;
+    int main_seen = 0;
+    int paren_count = 0;
+    int brace_count = 0;
+    int main_stage = 0;
 
-    printf(YELLOW "TOKENS FOUND:\n" RESET);
+    printf("TOKENS FOUND:\n");
     printf("--------------------------------------------\n");
 
     ch = fgetc(lexi->fptr);
 
     while (ch != EOF)
     {
-        if (ch == '\n')   // New line
+        if (ch == '\n') // New line
         {
             line++;
             ch = fgetc(lexi->fptr);
@@ -93,14 +71,14 @@ Status start_lexical_analysis(Lexical *lexi)
             continue;
         }
 
-        /* Preprocessor */
+        // Preprocessor
         if (ch == '#')
         {
             skip_header_files(lexi, &ch, &line);
             continue;
         }
 
-        /* Identifier or keyword */
+        // Identifier or keyword
         if (isalpha(ch) || ch == '_')
         {
             i = 0;
@@ -114,27 +92,152 @@ Status start_lexical_analysis(Lexical *lexi)
             if (is_keyword(lexi, buffer))
                 print_token("Keyword", buffer);
             else
+            {
                 print_token("Identifier", buffer);
+
+                if (strcmp(buffer, "main") == 0)
+                {
+                    main_seen = 1;
+                    main_stage = 1;
+                }
+            }
 
             continue;
         }
 
-        /* Numeric or float constant */
+        // Numeric constants (Decimal / Float / Hex / Octal / Binary)
         if (isdigit(ch))
         {
             i = 0;
-            int has_dot = 0;
+            buffer[i++] = ch;
+            ch = fgetc(lexi->fptr);
 
+            // Error: digit followed by alphabet (invalid identifier)
+            if ((isalpha(ch) || ch == '_') && !(buffer[0] == '0' && (ch == 'x' || ch == 'X' || ch == 'b' || ch == 'B')))
+            {
+                print_error_token("Error: Invalid identifier starting with digit on line", line);
+                return e_failure;
+            }
+
+            // Case: starts with 0 (hex / binary / octal)
+            if (buffer[0] == '0')
+            {
+                // Hexadecimal
+                if (ch == 'x' || ch == 'X')
+                {
+                    buffer[i++] = ch;
+                    ch = fgetc(lexi->fptr);
+
+                    int has_hex_digit = 0;
+
+                    while (isalnum(ch))
+                    {
+                        if (!isxdigit(ch))
+                        {
+                            print_error_token(
+                                "Error: Invalid Hexadecimal Number on line",
+                                line);
+                            return e_failure;
+                        }
+
+                        has_hex_digit = 1;
+                        buffer[i++] = ch;
+                        ch = fgetc(lexi->fptr);
+                    }
+
+                    if (!has_hex_digit)
+                    {
+                        print_error_token(
+                            "Error: Invalid Hexadecimal Number on line",
+                            line);
+                        return e_failure;
+                    }
+
+                    buffer[i] = '\0';
+                    print_token("Numeric constant", buffer);
+                    continue;
+                }
+
+                // Binary
+                if (ch == 'b' || ch == 'B')
+                {
+                    buffer[i++] = ch;
+                    ch = fgetc(lexi->fptr);
+
+                    int has_bit = 0;
+
+                    while (isalnum(ch))
+                    {
+                        if (ch != '0' && ch != '1')
+                        {
+                            print_error_token(
+                                "Error: Invalid Binary Number on line",
+                                line);
+                            return e_failure; // stop on first error
+                        }
+
+                        has_bit = 1;
+                        buffer[i++] = ch;
+                        ch = fgetc(lexi->fptr);
+                    }
+
+                    if (!has_bit)
+                    {
+                        print_error_token(
+                            "Error: Invalid Binary Number on line",
+                            line);
+                        return e_failure;
+                    }
+
+                    buffer[i] = '\0';
+                    print_token("Numeric constant", buffer);
+                    continue;
+                }
+
+                // Octal: starts with 0 followed by digits 0–7
+                int octal_error = 0;
+
+                while (isalnum(ch))
+                {
+                    if (ch >= '0' && ch <= '7')
+                    {
+                        buffer[i++] = ch;
+                    }
+                    else
+                    {
+                        octal_error = 1;
+                        break;
+                    }
+                    ch = fgetc(lexi->fptr);
+                }
+
+                if (octal_error)
+                {
+                    print_error_token(
+                        "Error: Invalid Octal Number on line",
+                        line);
+                    return e_failure;
+                }
+
+                buffer[i] = '\0';
+                print_token("Numeric constant", buffer);
+                continue;
+            }
+
+            // Decimal / Float
+            int has_dot = 0;
             while (isdigit(ch) || ch == '.')
             {
                 if (ch == '.' && has_dot)
                     break;
+
                 if (ch == '.')
                     has_dot = 1;
 
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
             }
+
             buffer[i] = '\0';
 
             if (has_dot)
@@ -145,7 +248,7 @@ Status start_lexical_analysis(Lexical *lexi)
             continue;
         }
 
-        /* String literal */
+        // String literal
         if (ch == '"')
         {
             i = 0;
@@ -158,6 +261,13 @@ Status start_lexical_analysis(Lexical *lexi)
                 ch = fgetc(lexi->fptr);
             }
 
+            // Error: string not closed
+            if (ch != '"')
+            {
+                print_error_token("Error: Unterminated string literal on line", line);
+                return e_failure;
+            }
+
             buffer[i++] = '"';
             buffer[i] = '\0';
 
@@ -166,17 +276,45 @@ Status start_lexical_analysis(Lexical *lexi)
             continue;
         }
 
-        /* Character constant */
+        // Character constant
         if (ch == '\'')
         {
             i = 0;
             buffer[i++] = ch;
             ch = fgetc(lexi->fptr);
 
-            if (ch == '\\')   // Escape sequence
+            // Error: EOF or newline immediately after '
+            if (ch == '\n' || ch == EOF)
+            {
+                print_error_token(
+                    "Error: Unterminated character constant on line",
+                    line);
+                return e_failure;
+            }
+
+            // Error: empty character constant ''
+            if (ch == '\'')
+            {
+                print_error_token(
+                    "Error: Empty character constant on line",
+                    line);
+                return e_failure;
+            }
+
+            // Escape sequence
+            if (ch == '\\')
             {
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
+
+                if (ch == '\n' || ch == EOF)
+                {
+                    print_error_token(
+                        "Error: Unterminated character constant on line",
+                        line);
+                    return e_failure;
+                }
+
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
             }
@@ -184,6 +322,24 @@ Status start_lexical_analysis(Lexical *lexi)
             {
                 buffer[i++] = ch;
                 ch = fgetc(lexi->fptr);
+            }
+
+            // Unterminated character constant
+            if (ch == '\n' || ch == EOF || ch == ';')
+            {
+                print_error_token(
+                    "Error: Unterminated character constant on line",
+                    line);
+                return e_failure;
+            }
+
+            // Too many characters like 'ab'
+            if (ch != '\'')
+            {
+                print_error_token(
+                    "Error: Too many characters in character constant on line",
+                    line);
+                return e_failure;
             }
 
             buffer[i++] = '\'';
@@ -194,21 +350,22 @@ Status start_lexical_analysis(Lexical *lexi)
             continue;
         }
 
-        /* Comments or division */
+        // Comments or division
         if (ch == '/')
         {
             next = fgetc(lexi->fptr);
 
-            if (next == '/')   // Single-line comment
+            if (next == '/') // Single-line comment
             {
-                while ((ch = fgetc(lexi->fptr)) != '\n' && ch != EOF);
+                while ((ch = fgetc(lexi->fptr)) != '\n' && ch != EOF)
+                    ;
                 if (ch == '\n')
                     line++;
                 ch = fgetc(lexi->fptr);
                 continue;
             }
 
-            if (next == '*')   // Multi-line comment
+            if (next == '*') // Multi-line comment
             {
                 int prev = 0;
                 while ((ch = fgetc(lexi->fptr)) != EOF)
@@ -228,16 +385,12 @@ Status start_lexical_analysis(Lexical *lexi)
             continue;
         }
 
-        /* Operators */
+        // Operators
         if (strchr("+-*=<>!&|%^", ch))
         {
             next = fgetc(lexi->fptr);
 
-            if (next == '=' ||
-                (ch == '+' && next == '+') ||
-                (ch == '-' && next == '-') ||
-                (ch == '&' && next == '&') ||
-                (ch == '|' && next == '|'))
+            if (next == '=' || (ch == '+' && next == '+') || (ch == '-' && next == '-') || (ch == '&' && next == '&') || (ch == '|' && next == '|'))
             {
                 char op[3] = {ch, next, '\0'};
                 print_token("Operator", op);
@@ -252,25 +405,105 @@ Status start_lexical_analysis(Lexical *lexi)
             continue;
         }
 
-        /* Symbols */
+        // Symbol
         if (strchr(";,{}()[]#", ch))
         {
             char sym[2] = {ch, '\0'};
             print_token("Symbol", sym);
+
+            if (main_seen)
+            {
+                if (main_stage == 1) // expecting '('
+                {
+                    if (ch == '(')
+                    {
+                        paren_count = 1;
+                        main_stage = 2;
+                    }
+                    else
+                    {
+                        print_error_token(
+                            "Error: Expected '(' after main on line",
+                            line);
+                        return e_failure;
+                    }
+                }
+                else if (main_stage == 2) // expecting ')'
+                {
+                    if (ch == ')')
+                    {
+                        paren_count--;
+                        main_stage = 3;
+                    }
+                    else
+                    {
+                        print_error_token(
+                            "Error: Expected ')' after '(' in main on line",
+                            line);
+                        return e_failure;
+                    }
+                }
+                else if (main_stage == 3) // expecting '{'
+                {
+                    if (ch == '{')
+                    {
+                        main_seen = 0;
+                        main_stage = 0;
+                    }
+                    else
+                    {
+                        print_error_token(
+                            "Error: Expected '{' after main() on line",
+                            line);
+                        return e_failure;
+                    }
+                }
+            }
+            // Count braces after main has started
+            if (brace_count >= 0)
+            {
+                if (ch == '{')
+                    brace_count++;
+                else if (ch == '}')
+                    brace_count--;
+            }
+
             ch = fgetc(lexi->fptr);
             continue;
         }
 
-        /* Unknown character */
+        // Unknown character
         ch = fgetc(lexi->fptr);
     }
 
-    printf("--------------------------------------------\n");
+    if (paren_count != 0)
+    {
+        print_error_token(
+            "Error: '(' not closed in main",
+            line);
+        return e_failure;
+    }
 
+    if (brace_count != 0)
+    {
+        print_error_token(
+            "Error: Opening '{' not closed in main",
+            line);
+        return e_failure;
+    }
+    if (main_stage == 3)
+    {
+        print_error_token(
+            "Error: Missing '{' after main()",
+            line);
+        return e_failure;
+    }
+
+    printf("--------------------------------------------\n");
     return e_success;
 }
 
-/* Load C keywords */
+// Load C keywords
 void keyword(Lexical *lexi)
 {
     const char *kw[] = {
@@ -286,7 +519,7 @@ void keyword(Lexical *lexi)
     lexi->keyword_count = 32;
 }
 
-/* Validate input file */
+// Validate input file
 Status read_and_validation_args(char *argv[], Lexical *lexi)
 {
     if (argv[1][0] == '.') // Hidden file check
@@ -312,7 +545,7 @@ Status read_and_validation_args(char *argv[], Lexical *lexi)
     return e_failure;
 }
 
-/* Open source file */
+// Open source file
 Status open_file(Lexical *lexi)
 {
     lexi->fptr = fopen(lexi->fname, "r"); // Open C file
